@@ -18,6 +18,7 @@ class _SandeshAppState extends State<SandeshApp> {
   bool isOnline = false;
   late IO.Socket _socket;
   late String userId = 'DISCONNECTED';
+  final String serverUrl = 'http://ramdipali.in';
 
   // [{id: room_1, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_2, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_3, members: [LQMLxFdKOvkgE-wxAAAX]}]
   var LobbyData = [];
@@ -56,7 +57,7 @@ class _SandeshAppState extends State<SandeshApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _socket = IO.io("http://192.168.1.4:5000", {
+    _socket = IO.io(serverUrl, {
       "transports": ["websocket"],
       "autoconnect": true,
     });
@@ -98,7 +99,12 @@ class _SandeshAppState extends State<SandeshApp> {
                           Tab(icon: Icon(Icons.person)),
                         ],
                       ),
-                      title: Text("संदेश मेनू ID: $userId"),
+                      title: Column(
+                        children: [
+                          Text("संदेश मेनू ID: $userId"),
+                          Text("SERVER: $serverUrl")
+                        ],
+                      ),
                     ),
                     body: TabBarView(
                       children: [
