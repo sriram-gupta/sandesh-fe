@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:sandesh_app_fe/screens/screens.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'widgets/widgets.dart';
 
 void main() {
-  runApp(const SandeshApp());
+  runApp(MaterialApp(
+    theme: ThemeData.dark(useMaterial3: true),
+    debugShowCheckedModeBanner: false,
+    home: const SandeshApp(),
+  ));
 }
 
 class SandeshApp extends StatefulWidget {
@@ -18,7 +23,7 @@ class _SandeshAppState extends State<SandeshApp> {
   bool isOnline = false;
   late IO.Socket _socket;
   late String userId = 'DISCONNECTED';
-  final String serverUrl = 'http://ramdipali.in';
+  final String serverUrl = 'http://192.168.1.4:5000';
 
   // [{id: room_1, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_2, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_3, members: [LQMLxFdKOvkgE-wxAAAX]}]
   var LobbyData = [];
@@ -67,126 +72,153 @@ class _SandeshAppState extends State<SandeshApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark(useMaterial3: true),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: CustomAppBar(isOnline: isOnline),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('हरि ॐ !'),
-              const Text(
-                  'आप किसी भी विषय से जुड़ सकते हैं और अपने विचार व्यक्त कर सकते हैं ! कृपया सभी का सम्मान करें और अभद्र शब्दों का प्रयोग न करें'),
-              // Removed the Container that was wrapping the Expanded
-              Expanded(
-                child: DefaultTabController(
-                  initialIndex: 1,
-                  length: 3,
-                  child: Scaffold(
-                    appBar: AppBar(
-                      bottom: const TabBar(
-                        indicatorWeight: 5,
-                        tabs: [
-                          Tab(
-                              icon: Icon(
-                            Icons.add_box,
-                          )),
-                          Tab(icon: Icon(Icons.home)),
-                          Tab(icon: Icon(Icons.person)),
-                        ],
-                      ),
-                      title: Column(
-                        children: [
-                          Text("संदेश मेनू ID: $userId"),
-                          Text("SERVER: $serverUrl")
-                        ],
-                      ),
+    return Scaffold(
+      appBar: CustomAppBar(isOnline: isOnline),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('हरि ॐ !'),
+            const Text(
+                'आप किसी भी विषय से जुड़ सकते हैं और अपने विचार व्यक्त कर सकते हैं ! कृपया सभी का सम्मान करें और अभद्र शब्दों का प्रयोग न करें'),
+            // Removed the Container that was wrapping the Expanded
+            Expanded(
+              child: DefaultTabController(
+                initialIndex: 1,
+                length: 3,
+                child: Scaffold(
+                  appBar: AppBar(
+                    bottom: const TabBar(
+                      indicatorWeight: 5,
+                      tabs: [
+                        Tab(
+                            icon: Icon(
+                          Icons.add_box,
+                        )),
+                        Tab(icon: Icon(Icons.home)),
+                        Tab(icon: Icon(Icons.person)),
+                      ],
                     ),
-                    body: TabBarView(
+                    title: Column(
                       children: [
-                        Container(
-                          child: CreateTopicWidget(socket: _socket),
-                        ),
-                        Container(
-                          child: SingleChildScrollView(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('name'),
-                                      Text('id'),
-                                      Text('members Count'),
-                                      Text('Actions')
-                                    ],
-                                  ),
-                                  ..._buildLobby()
-                                ]),
-                          ),
-                        ),
-                        const Icon(Icons.person),
+                        Text("संदेश मेनू ID: $userId"),
+                        Text("SERVER: $serverUrl")
                       ],
                     ),
                   ),
+                  body: TabBarView(
+                    children: [
+                      Container(
+                        child: CreateTopicWidget(socket: _socket),
+                      ),
+                      Container(
+                        child: SingleChildScrollView(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('name'),
+                                    Text('id'),
+                                    Text('members Count'),
+                                    Text('Actions')
+                                  ],
+                                ),
+                                ...List.generate(
+                                    LobbyData.length,
+                                    (index) => Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              flex: 8,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ChatScreen(
+                                                                socket: _socket,
+                                                                roomData:
+                                                                    LobbyData[
+                                                                        index],
+                                                                LobbyData:
+                                                                    LobbyData)),
+                                                  );
+                                                },
+                                                child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(LobbyData[index]
+                                                          ['name']),
+                                                      Text(LobbyData[index]
+                                                          ['id']),
+                                                      Text(LobbyData[index]
+                                                              ['members']
+                                                          .length
+                                                          .toString()),
+                                                    ]),
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Expanded(
+                                              flex: 6,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      _socket.emit(
+                                                          'join_room', {
+                                                        'roomID':
+                                                            LobbyData[index]
+                                                                ['id']
+                                                      });
+                                                    },
+                                                    icon: const Icon(Icons.add),
+                                                  ),
+                                                  IconButton(
+                                                      iconSize: 18,
+                                                      onPressed: () {},
+                                                      icon: const Icon(
+                                                          Icons.remove)),
+                                                  IconButton(
+                                                      iconSize: 18,
+                                                      onPressed: () {
+                                                        _socket.emit(
+                                                            'delete_room', {
+                                                          'roomID':
+                                                              LobbyData[index]
+                                                                  ['id']
+                                                        });
+                                                      },
+                                                      icon: const Icon(
+                                                          Icons.delete))
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        )).toList()
+                              ]),
+                        ),
+                      ),
+                      const Icon(Icons.person),
+                    ],
+                  ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );
-  }
-
-  List<Widget> _buildLobby() {
-    return List.generate(
-        LobbyData.length,
-        (index) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 8,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(LobbyData[index]['name']),
-                        Text(LobbyData[index]['id']),
-                        Text(LobbyData[index]['members'].length.toString()),
-                      ]),
-                ),
-                const Spacer(),
-                Expanded(
-                  flex: 6,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          _socket.emit(
-                              'join_room', {'roomID': LobbyData[index]['id']});
-                        },
-                        icon: const Icon(Icons.add),
-                      ),
-                      IconButton(
-                          iconSize: 18,
-                          onPressed: () {},
-                          icon: const Icon(Icons.remove)),
-                      IconButton(
-                          iconSize: 18,
-                          onPressed: () {
-                            _socket.emit('delete_room',
-                                {'roomID': LobbyData[index]['id']});
-                          },
-                          icon: const Icon(Icons.delete))
-                    ],
-                  ),
-                )
-              ],
-            ));
   }
 }
