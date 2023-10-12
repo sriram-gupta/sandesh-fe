@@ -80,12 +80,15 @@ class _SandeshAppState extends State<SandeshApp> {
     return Scaffold(
       appBar: CustomAppBar(isOnline: isOnline),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(3.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('हरि ॐ !'),
+            const Text(
+              'हरि ॐ !',
+              style: TextStyle(fontSize: 20),
+            ),
             const Text(
                 'आप किसी भी विषय से जुड़ सकते हैं और अपने विचार व्यक्त कर सकते हैं ! कृपया सभी का सम्मान करें और अभद्र शब्दों का प्रयोग न करें'),
             // Removed the Container that was wrapping the Expanded
@@ -95,18 +98,30 @@ class _SandeshAppState extends State<SandeshApp> {
                 length: 3,
                 child: Scaffold(
                   appBar: AppBar(
+                    title: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("संदेश मेनू ID: $userId",
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: 'Roboto')),
+                        Text("SERVER: $serverUrl",
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: 'Roboto'))
+                      ],
+                    ),
                     bottom: const TabBar(
                       indicatorWeight: 5,
                       tabs: [
                         Tab(icon: Icon(Icons.add_box)),
                         Tab(icon: Icon(Icons.home)),
                         Tab(icon: Icon(Icons.person)),
-                      ],
-                    ),
-                    title: Column(
-                      children: [
-                        Text("संदेश मेनू ID: $userId"),
-                        Text("SERVER: $serverUrl")
                       ],
                     ),
                   ),

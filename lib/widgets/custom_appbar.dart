@@ -12,7 +12,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 80,
+      toolbarHeight: 50,
+      // toolbarHeight: 60,
       leading: Flag.fromCode(
         FlagsCode.IN,
         height: 30, // Set the flag icon's height
@@ -23,14 +24,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Text(
             'भारत का संदेश',
             style: TextStyle(
-                fontSize: 35,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Roboto'),
           ),
           Text(
             'अब करो जी भर के बात ! (जय श्री राम)',
             style: TextStyle(
-                fontSize: 18,
+                fontSize: 12,
                 fontWeight: FontWeight.normal,
                 fontFamily: 'Roboto'),
           ),
