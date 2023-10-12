@@ -20,11 +20,13 @@ class SandeshApp extends StatefulWidget {
 }
 
 class _SandeshAppState extends State<SandeshApp> {
+  int tabIndex = 1;
+
   bool isOnline = false;
   late IO.Socket _socket;
   late String userId = 'DISCONNECTED';
-  final String serverUrl = 'http://192.168.1.4:5000';
-
+  final String serverUrl = 'http://ramdipali.in'; //'http://192.168.1.4:5000';
+  late int chatRoomIndex = 0;
   // [{id: room_1, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_2, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_3, members: [LQMLxFdKOvkgE-wxAAAX]}]
   var LobbyData = [];
 
@@ -72,6 +74,9 @@ class _SandeshAppState extends State<SandeshApp> {
 
   @override
   Widget build(BuildContext context) {
+    print("BUILDING  MAIN SCREEN ");
+    print("TABiNDEX $tabIndex");
+
     return Scaffold(
       appBar: CustomAppBar(isOnline: isOnline),
       body: Padding(
@@ -86,17 +91,14 @@ class _SandeshAppState extends State<SandeshApp> {
             // Removed the Container that was wrapping the Expanded
             Expanded(
               child: DefaultTabController(
-                initialIndex: 1,
+                initialIndex: tabIndex,
                 length: 3,
                 child: Scaffold(
                   appBar: AppBar(
                     bottom: const TabBar(
                       indicatorWeight: 5,
                       tabs: [
-                        Tab(
-                            icon: Icon(
-                          Icons.add_box,
-                        )),
+                        Tab(icon: Icon(Icons.add_box)),
                         Tab(icon: Icon(Icons.home)),
                         Tab(icon: Icon(Icons.person)),
                       ],
@@ -138,18 +140,10 @@ class _SandeshAppState extends State<SandeshApp> {
                                               flex: 8,
                                               child: InkWell(
                                                 onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChatScreen(
-                                                                socket: _socket,
-                                                                roomData:
-                                                                    LobbyData[
-                                                                        index],
-                                                                LobbyData:
-                                                                    LobbyData)),
-                                                  );
+                                                  setState(() {
+                                                    chatRoomIndex = index;
+                                                    tabIndex = 0;
+                                                  });
                                                 },
                                                 child: Row(
                                                     mainAxisAlignment:
@@ -210,7 +204,10 @@ class _SandeshAppState extends State<SandeshApp> {
                               ]),
                         ),
                       ),
-                      const Icon(Icons.person),
+                      ChatScreen(
+                          socket: _socket,
+                          roomData: LobbyData[chatRoomIndex],
+                          LobbyData: LobbyData),
                     ],
                   ),
                 ),

@@ -23,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("BUILDING CHAT SCREEN ");
     final chatData =
         widget.LobbyData.where((e) => e['id'] == widget.roomData['id']);
     final chatMessages = chatData.isNotEmpty ? chatData.first['messages'] : [];
@@ -43,7 +44,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(chatMessages[index]['msg']),
-                        Text(chatMessages[index]['sender'])
+                        Text(chatMessages[index]['sender']
+                            .toString()
+                            .substring(0, 5))
                       ]),
                 );
               },
