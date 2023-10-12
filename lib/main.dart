@@ -17,6 +17,7 @@ class SandeshApp extends StatefulWidget {
 class _SandeshAppState extends State<SandeshApp> {
   bool isOnline = false;
   late IO.Socket _socket;
+  late String userId = 'DISCONNECTED';
 
   // [{id: room_1, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_2, members: [LQMLxFdKOvkgE-wxAAAX]}, {id: room_3, members: [LQMLxFdKOvkgE-wxAAAX]}]
   var LobbyData = [];
@@ -30,9 +31,16 @@ class _SandeshAppState extends State<SandeshApp> {
       });
     });
 
+    _socket.on('getId', (socketId) {
+      setState(() {
+        userId = socketId;
+      });
+    });
+
     _socket.onDisconnect((data) {
       setState(() {
         isOnline = false;
+        userId = 'DISCONNECTED';
       });
     });
     // Register event handlers
@@ -48,7 +56,7 @@ class _SandeshAppState extends State<SandeshApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _socket = IO.io("http://ramdipali.in", {
+    _socket = IO.io("http://192.168.1.4:5000", {
       "transports": ["websocket"],
       "autoconnect": true,
     });
@@ -90,7 +98,7 @@ class _SandeshAppState extends State<SandeshApp> {
                           Tab(icon: Icon(Icons.person)),
                         ],
                       ),
-                      title: const Text('संदेश मेनू'),
+                      title: Text("संदेश मेनू ID: $userId"),
                     ),
                     body: TabBarView(
                       children: [
@@ -108,7 +116,8 @@ class _SandeshAppState extends State<SandeshApp> {
                                     children: [
                                       Text('name'),
                                       Text('id'),
-                                      Text('members Count')
+                                      Text('members Count'),
+                                      Text('Actions')
                                     ],
                                   ),
                                   ..._buildLobby()
@@ -131,16 +140,47 @@ class _SandeshAppState extends State<SandeshApp> {
   List<Widget> _buildLobby() {
     return List.generate(
         LobbyData.length,
-        (index) => InkWell(
-              onTap: () => print(LobbyData[index]),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(LobbyData[index]['name']),
-                  Text(LobbyData[index]['id']),
-                  Text(LobbyData[index]['members'].length.toString())
-                ],
-              ),
+        (index) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 8,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(LobbyData[index]['name']),
+                        Text(LobbyData[index]['id']),
+                        Text(LobbyData[index]['members'].length.toString()),
+                      ]),
+                ),
+                const Spacer(),
+                Expanded(
+                  flex: 6,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          _socket.emit(
+                              'join_room', {'roomID': LobbyData[index]['id']});
+                        },
+                        icon: const Icon(Icons.add),
+                      ),
+                      IconButton(
+                          iconSize: 18,
+                          onPressed: () {},
+                          icon: const Icon(Icons.remove)),
+                      IconButton(
+                          iconSize: 18,
+                          onPressed: () {
+                            _socket.emit('delete_room',
+                                {'roomID': LobbyData[index]['id']});
+                          },
+                          icon: const Icon(Icons.delete))
+                    ],
+                  ),
+                )
+              ],
             ));
   }
 }
